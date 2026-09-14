@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR" data-tema="claro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Painel de leads</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/estilo.css" />
+  </head>
+  <body class="painel-corpo">
+    <header class="topo-painel">
+      <div class="marca">
+        <span class="marca-icone">P</span>
+        <span id="nome-programa">Painel de leads</span>
+      </div>
+
+      <div class="abas" role="tablist">
+        <button type="button" class="ativa" data-visao="quadro">Quadro A/B/C</button>
+        <button type="button" data-visao="lista">Lista</button>
+      </div>
+
+      <span class="espacador"></span>
+
+      <button class="botao botao--secundario botao--pequeno" id="botao-exportar" type="button">
+        Exportar CSV
+      </button>
+      <button class="botao botao--secundario botao--pequeno" id="botao-tema" type="button">
+        Tema
+      </button>
+      <button class="botao botao--secundario botao--pequeno" id="botao-sair" type="button">
+        Sair
+      </button>
+    </header>
+
+    <main class="conteudo-painel">
+      <div class="aviso esconder" id="aviso-senha">
+        A senha do painel ainda é a padrão. Crie um arquivo <strong>.env</strong> com
+        <strong>SENHA_PAINEL=sua-senha</strong> antes de publicar o site.
+      </div>
+
+      <section class="grade-indicadores" id="indicadores"></section>
+
+      <div class="barra-ferramentas">
+        <input class="busca" type="search" id="busca" placeholder="Buscar por nome, e-mail, cidade..." />
+        <select id="filtro-status"><option value="">Todos os status</option></select>
+        <select id="filtro-origem"><option value="">Todas as origens</option></select>
+        <select id="filtro-periodo">
+          <option value="0">Desde o início</option>
+          <option value="1">Hoje</option>
+          <option value="7">Últimos 7 dias</option>
+          <option value="30">Últimos 30 dias</option>
+        </select>
+        <select id="ordenar">
+          <option value="recentes">Mais recentes</option>
+          <option value="nota">Maior nota</option>
+          <option value="antigos">Mais antigos</option>
+          <option value="nome">Nome (A-Z)</option>
+        </select>
+        <button class="botao botao--secundario botao--pequeno" id="botao-limpar" type="button">
+          Limpar filtros
+        </button>
+      </div>
+
+      <section id="visao-quadro">
+        <div class="quadro" id="quadro"></div>
+      </section>
+
+      <section id="visao-lista" class="esconder">
+        <div class="envolve-tabela">
+          <table>
+            <thead>
+              <tr>
+                <th>Classe</th>
+                <th>Nota</th>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Cidade</th>
+                <th>Status</th>
+                <th>Inscrição</th>
+              </tr>
+            </thead>
+            <tbody id="corpo-tabela"></tbody>
+          </table>
+        </div>
+        <div class="vazio esconder" id="lista-vazia">
+          <div class="icone">📭</div>
+          <p>Nenhum lead com esses filtros.</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="fundo-escuro" id="fundo-escuro"></div>
+    <aside class="gaveta" id="gaveta" aria-hidden="true"></aside>
+
+    <script type="module" src="/js/painel.js"></script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "captacao-leads-abc",
+  "version": "1.0.0",
+  "description": "Site de inscricao para parceria com separacao automatica de leads em A, B e C",
+  "type": "module",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test testes/*.test.js",
+    "exemplo": "node ferramentas/dados-exemplo.js"
+  },
+  "keywords": [
+    "leads",
+    "captacao",
+    "parceria",
+    "crm",
+    "qualificacao"
+  ],
+  "license": "MIT"
+}

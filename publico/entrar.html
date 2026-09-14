@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR" data-tema="claro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar no painel</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/estilo.css" />
+  </head>
+  <body>
+    <div class="tela-login">
+      <div class="cartao caixa-login">
+        <div class="marca" style="margin-bottom: 20px">
+          <span class="marca-icone">P</span>
+          <span>Painel de leads</span>
+        </div>
+        <h1>Entrar</h1>
+        <p>Área restrita ao time comercial.</p>
+
+        <form id="formulario-login">
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" autocomplete="current-password" autofocus />
+            <span class="mensagem-erro" id="erro"></span>
+          </div>
+          <button class="botao" type="submit" style="width: 100%" id="botao">Entrar</button>
+        </form>
+
+        <p style="margin-top: 22px; text-align: center; font-size: 0.85rem">
+          <a href="/">Voltar para o site</a>
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      import { aplicarTemaSalvo, pedir } from "/js/comum.js"
+
+      aplicarTemaSalvo()
+
+      const formulario = document.getElementById("formulario-login")
+      const erro = document.getElementById("erro")
+      const botao = document.getElementById("botao")
+
+      formulario.addEventListener("submit", async (evento) => {
+        evento.preventDefault()
+        erro.textContent = ""
+        botao.disabled = true
+        botao.textContent = "Entrando..."
+        try {
+          await pedir("/api/login", {
+            method: "POST",
+            corpo: { senha: document.getElementById("senha").value },
+          })
+          window.location.href = "/painel"
+        } catch (falha) {
+          erro.textContent = falha.message || "Não consegui entrar."
+          botao.disabled = false
+          botao.textContent = "Entrar"
+        }
+      })
+    </script>
+  </body>
+</html>
