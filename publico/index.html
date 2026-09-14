@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR" data-tema="claro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inscrição para parceria</title>
+    <meta
+      name="description"
+      content="Formulário de inscrição para o programa de parceria. Preencha e nosso time entra em contato."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/fontes.css" />
+    <link rel="stylesheet" href="/css/estilo.css" />
+  </head>
+  <body>
+    <header class="faixa-marca">
+      <div class="faixa-conteudo">
+        <a class="logo-omega" href="/">
+          <img src="/logo-omega.svg" alt="Omega Diagnóstico Odontológico" />
+        </a>
+        <button class="botao botao--secundario botao--pequeno" id="botao-tema" type="button">
+          Tema
+        </button>
+      </div>
+    </header>
+
+    <div class="publico">
+      <main class="heroi">
+        <section>
+          <h1 id="chamada">Seja parceiro e cresça com a gente</h1>
+          <p class="chamada" id="sub-chamada"></p>
+          <ul class="lista-beneficios" id="beneficios"></ul>
+          <div class="selo-etapas">
+            <span>1. Você se inscreve</span>
+            <span>2. Analisamos seu perfil</span>
+            <span>3. Time comercial te chama</span>
+          </div>
+        </section>
+
+        <section class="cartao painel-formulario" id="caixa-formulario">
+          <h2 id="titulo-formulario">Inscrição para parceria</h2>
+          <p class="subtitulo" id="subtitulo-formulario"></p>
+
+          <form id="formulario" novalidate>
+            <div id="campos"><p class="subtitulo">Carregando formulário...</p></div>
+
+            <!-- Campo isca invisível: se vier preenchido, é robô. -->
+            <input class="isca" type="text" name="website" id="website" tabindex="-1" autocomplete="off" />
+
+            <p class="mensagem-erro" id="erro-geral"></p>
+            <button class="botao" type="submit" id="botao-enviar" style="width: 100%">
+              Quero ser parceiro
+            </button>
+            <p class="subtitulo" style="margin: 14px 0 0; text-align: center; font-size: 0.8rem">
+              Seus dados são usados apenas para contato sobre a parceria.
+            </p>
+          </form>
+        </section>
+      </main>
+
+      <footer class="rodape-publico">
+        <p>
+          &copy; <span id="ano"></span> Omega Diagnóstico Odontológico ·
+          <span class="nome-programa-rodape">Programa de Parceria</span> ·
+          <a href="/painel">Acesso da equipe</a>
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="/js/formulario.js"></script>
+  </body>
+</html>

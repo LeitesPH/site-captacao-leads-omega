@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR" data-tema="claro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar no painel</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/fontes.css" />
+    <link rel="stylesheet" href="/css/estilo.css" />
+  </head>
+  <body>
+    <div class="tela-login">
+      <div>
+        <div class="login-marca">
+          <span class="logo-omega logo-omega--grande">
+            <img src="/logo-omega.svg" alt="Omega Diagnóstico Odontológico" />
+          </span>
+        </div>
+
+        <div class="cartao caixa-login">
+        <h1>Painel de leads</h1>
+        <p>Área restrita. Use o login e a senha que você recebeu.</p>
+
+        <form id="formulario-login">
+          <div class="campo">
+            <label for="usuario">Login</label>
+            <input
+              type="text"
+              id="usuario"
+              name="usuario"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              autofocus
+            />
+          </div>
+
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" autocomplete="current-password" />
+            <span class="mensagem-erro" id="erro"></span>
+          </div>
+
+          <button class="botao" type="submit" style="width: 100%" id="botao">Entrar</button>
+        </form>
+
+        </div>
+
+        <p class="rodape-login">
+          <a href="/">Voltar para o formulário de inscrição</a>
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      import { aplicarTemaSalvo, pedir } from "/js/comum.js"
+
+      aplicarTemaSalvo()
+
+      const formulario = document.getElementById("formulario-login")
+      const erro = document.getElementById("erro")
+      const botao = document.getElementById("botao")
+
+      formulario.addEventListener("submit", async (evento) => {
+        evento.preventDefault()
+        erro.textContent = ""
+
+        const usuario = document.getElementById("usuario").value.trim()
+        const senha = document.getElementById("senha").value
+
+        if (!usuario || !senha) {
+          erro.textContent = "Preencha o login e a senha."
+          return
+        }
+
+        botao.disabled = true
+        botao.textContent = "Entrando..."
+
+        try {
+          await pedir("/api/login", { method: "POST", corpo: { usuario, senha } })
+          window.location.href = "/painel"
+        } catch (falha) {
+          erro.textContent = falha.message || "Não consegui entrar."
+          document.getElementById("senha").value = ""
+          document.getElementById("senha").focus()
+          botao.disabled = false
+          botao.textContent = "Entrar"
+        }
+      })
+    </script>
+  </body>
+</html>
