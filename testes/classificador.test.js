@@ -5,67 +5,58 @@ import { FAIXAS, PONTUACAO_MAXIMA } from "../src/criterios.js"
 
 const CONTATO = {
   nome: "Maria Souza",
+  clinica: "Clinica Souza",
   email: "maria@exemplo.com",
   whatsapp: "(11) 98888-7777",
   cidade: "Sao Paulo / SP",
 }
 
+/** Dentista de alto volume que quer indicar tudo para a Omega. */
 const PERFIL_TOPO = {
   ...CONTATO,
-  area: "mesmo_setor",
-  faturamento: "acima_100k",
-  tempo_mercado: "mais_5_anos",
+  exames_dia: "mais_10",
+  pacientes_semana: "mais_100",
   equipe: "mais_10",
-  carteira: "mais_50",
-  experiencia: "sim_resultado",
-  investimento: "acima_20k",
-  dedicacao: "integral",
-  inicio: "imediato",
-  decisor: "sim",
+  faturamento: "acima_150k",
+  dificuldade: "demora",
+  objetivo_parceria: "recorrencia",
   origem: "indicacao",
 }
 
+/** Consultorio pequeno, sem volume e sem dor. */
 const PERFIL_FRACO = {
   ...CONTATO,
-  area: "sem_area",
-  faturamento: "sem_faturamento",
-  tempo_mercado: "comecando",
+  exames_dia: "poucos",
+  pacientes_semana: "menos_10",
   equipe: "sozinho",
-  carteira: "nenhum",
-  experiencia: "nao",
-  investimento: "ate_1k",
-  dedicacao: "menos_10",
-  inicio: "90_dias",
-  decisor: "nao",
+  faturamento: "ate_15k",
+  dificuldade: "sem_dificuldade",
+  objetivo_parceria: "desconto",
   origem: "google",
 }
 
-test("perfil no topo de todas as respostas vira A com nota 100", () => {
+test("dentista de alto volume vira A com nota 100", () => {
   const resultado = classificar(PERFIL_TOPO)
   assert.equal(resultado.nota, 100)
   assert.equal(resultado.classe, "A")
   assert.equal(resultado.pontuacao, PONTUACAO_MAXIMA)
 })
 
-test("perfil fraco vira C", () => {
+test("consultorio pequeno e sem dor vira C", () => {
   const resultado = classificar(PERFIL_FRACO)
   assert.equal(resultado.classe, "C")
   assert.ok(resultado.nota < FAIXAS.B.minimo)
 })
 
-test("perfil intermediario vira B", () => {
+test("clinica de porte medio vira B", () => {
   const resultado = classificar({
     ...CONTATO,
-    area: "vendas",
-    faturamento: "20k_50k",
-    tempo_mercado: "1_2_anos",
-    equipe: "2_3",
-    carteira: "ate_10",
-    experiencia: "nao_conheco",
-    investimento: "1k_5k",
-    dedicacao: "10_20",
-    inicio: "30_dias",
-    decisor: "socio",
+    exames_dia: "1_2",
+    pacientes_semana: "21_50",
+    equipe: "3_5",
+    faturamento: "15_40k",
+    dificuldade: "preco",
+    objetivo_parceria: "desconto",
     origem: "instagram",
   })
   assert.equal(resultado.classe, "B")
@@ -78,28 +69,45 @@ test("respostas vazias nao quebram e caem em C", () => {
   assert.equal(resultado.classe, "C")
 })
 
-test('regra de limite: "sem previsao para comecar" derruba um perfil de topo para C', () => {
-  const resultado = classificar({ ...PERFIL_TOPO, inicio: "sem_previsao" })
+test("o volume de exames pesa mais do que o faturamento", () => {
+  const muitosExames = classificar({
+    ...PERFIL_FRACO,
+    exames_dia: "mais_10",
+  })
+  const muitoFaturamento = classificar({
+    ...PERFIL_FRACO,
+    faturamento: "acima_150k",
+  })
+  assert.ok(
+    muitosExames.nota > muitoFaturamento.nota,
+    "quem pede mais exames tem que pontuar mais do que quem so fatura mais",
+  )
+})
+
+// ------------------------------------------------------------- regras
+
+test("regra: quem nao pede exames de imagem nao passa de C", () => {
+  const resultado = classificar({ ...PERFIL_TOPO, exames_dia: "nenhum" })
   assert.equal(resultado.classe, "C")
   assert.equal(resultado.classePorNota, "A")
-  assert.equal(resultado.regrasAplicadas[0].id, "sem_previsao_e_c")
+  assert.equal(resultado.regrasAplicadas[0].id, "nao_pede_exames")
   assert.match(resultado.explicacao, /colocou o lead em C/)
 })
 
-test("regra de limite: quem nao pode investir agora nao passa de B", () => {
-  const resultado = classificar({ ...PERFIL_TOPO, investimento: "nao_posso" })
+test("regra: quem so esta conhecendo nao passa de B", () => {
+  const resultado = classificar({ ...PERFIL_TOPO, objetivo_parceria: "conhecer" })
   assert.equal(resultado.classe, "B")
+  assert.equal(resultado.regrasAplicadas[0].id, "so_conhecendo")
 })
 
-test("regra de piso: fatura alto, investe alto e comeca ja entra como A", () => {
+test("regra: muito volume mais intencao de indicar entra como A", () => {
   const resultado = classificar({
     ...PERFIL_FRACO,
-    faturamento: "acima_100k",
-    investimento: "acima_20k",
-    inicio: "imediato",
+    exames_dia: "6_10",
+    objetivo_parceria: "recorrencia",
   })
   assert.equal(resultado.classe, "A")
-  assert.equal(resultado.regrasAplicadas[0].id, "perfil_premium")
+  assert.equal(resultado.regrasAplicadas[0].id, "volume_alto")
 })
 
 test("faixas de nota respeitam os limites configurados", () => {
@@ -119,12 +127,12 @@ test("a explicacao cita a nota e a classe", () => {
 test("pontos fortes e fracos sao listados", () => {
   const resultado = classificar({
     ...PERFIL_TOPO,
-    dedicacao: "menos_10",
-    carteira: "nenhum",
+    equipe: "sozinho",
+    faturamento: "ate_15k",
   })
   assert.ok(resultado.pontosFortes.length > 0)
   assert.ok(resultado.pontosFracos.length > 0)
-  assert.ok(resultado.pontosFracos.some((p) => p.campo === "carteira"))
+  assert.ok(resultado.pontosFracos.some((p) => p.campo === "faturamento"))
 })
 
 // ------------------------------------------------------------- validacao
@@ -132,8 +140,10 @@ test("pontos fortes e fracos sao listados", () => {
 test("validacao aponta os campos obrigatorios que faltam", () => {
   const { valido, erros } = validarRespostas({ nome: "So o nome" })
   assert.equal(valido, false)
+  assert.equal(erros.clinica, "Campo obrigatório")
   assert.equal(erros.email, "Campo obrigatório")
   assert.equal(erros.whatsapp, "Campo obrigatório")
+  assert.equal(erros.exames_dia, "Campo obrigatório")
 })
 
 test("validacao recusa e-mail invalido", () => {
@@ -147,8 +157,8 @@ test("validacao recusa telefone curto", () => {
 })
 
 test("validacao recusa opcao que nao existe na lista", () => {
-  const { erros } = validarRespostas({ ...PERFIL_TOPO, faturamento: "um_bilhao" })
-  assert.equal(erros.faturamento, "Opção inválida")
+  const { erros } = validarRespostas({ ...PERFIL_TOPO, exames_dia: "quinhentos" })
+  assert.equal(erros.exames_dia, "Opção inválida")
 })
 
 test("telefone vira numero pronto para o WhatsApp com DDI 55", () => {
@@ -163,6 +173,6 @@ test("telefone que ja veio com DDI nao ganha outro 55", () => {
 })
 
 test("espacos em branco sao removidos das respostas", () => {
-  const { respostas } = validarRespostas({ ...PERFIL_TOPO, nome: "   Maria Souza   " })
-  assert.equal(respostas.nome, "Maria Souza")
+  const { respostas } = validarRespostas({ ...PERFIL_TOPO, clinica: "   Clinica Souza   " })
+  assert.equal(respostas.clinica, "Clinica Souza")
 })

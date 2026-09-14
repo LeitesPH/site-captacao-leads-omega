@@ -62,38 +62,32 @@ async function chamar(caminho, opcoes = {}) {
 }
 
 const INSCRICAO_A = {
-  nome: "Joao Parceiro",
+  nome: "Joao Dentista",
+  clinica: "Clinica Joao",
   email: "joao@exemplo.com",
   whatsapp: "(11) 97777-6666",
   cidade: "Campinas / SP",
-  area: "mesmo_setor",
-  faturamento: "acima_100k",
-  tempo_mercado: "mais_5_anos",
+  exames_dia: "mais_10",
+  pacientes_semana: "mais_100",
   equipe: "mais_10",
-  carteira: "mais_50",
-  experiencia: "sim_resultado",
-  investimento: "acima_20k",
-  dedicacao: "integral",
-  inicio: "imediato",
-  decisor: "sim",
+  faturamento: "acima_150k",
+  dificuldade: "demora",
+  objetivo_parceria: "recorrencia",
   origem: "indicacao",
 }
 
 const INSCRICAO_C = {
   nome: "Ana Curiosa",
+  clinica: "Consultorio Ana",
   email: "ana@exemplo.com",
   whatsapp: "(21) 96666-5555",
   cidade: "Rio de Janeiro / RJ",
-  area: "sem_area",
-  faturamento: "sem_faturamento",
-  tempo_mercado: "comecando",
+  exames_dia: "nenhum",
+  pacientes_semana: "menos_10",
   equipe: "sozinho",
-  carteira: "nenhum",
-  experiencia: "nao",
-  investimento: "ate_1k",
-  dedicacao: "menos_10",
-  inicio: "sem_previsao",
-  decisor: "nao",
+  faturamento: "ate_15k",
+  dificuldade: "sem_dificuldade",
+  objetivo_parceria: "conhecer",
   origem: "google",
 }
 
@@ -101,9 +95,9 @@ test("o formulario publico e servido sem login", async () => {
   const { status, dados } = await chamar("/api/formulario")
   assert.equal(status, 200)
   assert.ok(Array.isArray(dados.campos))
-  assert.ok(dados.campos.some((campo) => campo.id === "faturamento"))
+  assert.ok(dados.campos.some((campo) => campo.id === "exames_dia"))
   // as funcoes de regra e os pontos nao vazam para o navegador
-  const opcao = dados.campos.find((c) => c.id === "faturamento").opcoes[0]
+  const opcao = dados.campos.find((c) => c.id === "exames_dia").opcoes[0]
   assert.deepEqual(Object.keys(opcao).sort(), ["rotulo", "valor"])
 })
 
@@ -160,19 +154,16 @@ test("webhook aceita token certo e traduz nomes de campo externos", async () => 
     headers: { "x-token": config.tokenWebhook },
     corpo: {
       full_name: "Ana Curiosa",
+      clinic: "Consultorio Ana",
       "e-mail": "ana@exemplo.com",
       phone: "(21) 96666-5555",
       city: "Rio de Janeiro / RJ",
-      area: INSCRICAO_C.area,
-      faturamento: INSCRICAO_C.faturamento,
-      tempo_mercado: INSCRICAO_C.tempo_mercado,
+      exames_dia: INSCRICAO_C.exames_dia,
+      pacientes_semana: INSCRICAO_C.pacientes_semana,
       equipe: INSCRICAO_C.equipe,
-      carteira: INSCRICAO_C.carteira,
-      experiencia: INSCRICAO_C.experiencia,
-      investimento: INSCRICAO_C.investimento,
-      dedicacao: INSCRICAO_C.dedicacao,
-      inicio: INSCRICAO_C.inicio,
-      decisor: INSCRICAO_C.decisor,
+      faturamento: INSCRICAO_C.faturamento,
+      dificuldade: INSCRICAO_C.dificuldade,
+      objetivo_parceria: INSCRICAO_C.objetivo_parceria,
       origem: INSCRICAO_C.origem,
     },
   })

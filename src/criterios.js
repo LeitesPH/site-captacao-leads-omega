@@ -3,6 +3,12 @@
  *  ESTE É O ÚNICO ARQUIVO QUE VOCÊ PRECISA EDITAR PARA MUDAR O SISTEMA
  * ====================================================================
  *
+ * Contexto: a Omega é uma clínica de radiologia odontológica.
+ * O "parceiro" é o DENTISTA que passa a indicar exames para a Omega
+ * com recorrência. Por isso o que vale ponto aqui é volume de exames,
+ * tamanho da clínica e intenção de indicar - não tem nada de comissão,
+ * revenda ou investimento.
+ *
  * Aqui ficam:
  *   1) as perguntas do formulário de inscrição (o site público monta
  *      o formulário sozinho a partir desta lista);
@@ -24,20 +30,32 @@ export const CLASSES = ["A", "B", "C"]
 
 /** Faixas de nota que definem a classe. Ajuste os números se quiser ser mais ou menos exigente. */
 export const FAIXAS = {
-  A: { minimo: 70, rotulo: "Lead A", descricao: "Pronto para fechar. Fale hoje." },
-  B: { minimo: 45, rotulo: "Lead B", descricao: "Tem potencial. Precisa de nutrição." },
-  C: { minimo: 0, rotulo: "Lead C", descricao: "Fora do perfil agora. Deixe na base." },
+  A: {
+    minimo: 70,
+    rotulo: "Lead A",
+    descricao: "Volume alto e quer indicar. Fale hoje.",
+  },
+  B: {
+    minimo: 45,
+    rotulo: "Lead B",
+    descricao: "Tem potencial. Vale aproximar e nutrir.",
+  },
+  C: {
+    minimo: 0,
+    rotulo: "Lead C",
+    descricao: "Pouco volume agora. Deixe na base.",
+  },
 }
 
 /** Textos do site público. */
 export const TEXTOS_SITE = {
-  chamada: "Seja parceiro e cresça com a gente",
+  chamada: "Seja parceiro da Omega",
   subChamada:
-    "Preencha o formulário abaixo. Em até 48 horas nosso time analisa seu perfil e entra em contato pelo WhatsApp.",
+    "Indique seus exames para a Omega e tenha laudo rápido, contato direto com quem faz o exame e condições exclusivas. Preencha o formulário e nosso time entra em contato pelo WhatsApp.",
   beneficios: [
-    "Comissões recorrentes sobre cada cliente ativo",
-    "Material de vendas, treinamento e suporte dedicado",
-    "Time comercial para te ajudar a fechar os primeiros contratos",
+    "Seu exame pronto em até 24 horas",
+    "Conversa direta com o nosso time a qualquer momento, para o exame sair do jeito que você precisa",
+    "Descontos exclusivos para clínicas parceiras",
   ],
   tituloFormulario: "Inscrição para parceria",
   subtituloFormulario: "Leva menos de 3 minutos. Todos os campos com * são obrigatórios.",
@@ -54,11 +72,20 @@ export const TEXTOS_SITE = {
 export const CAMPOS = [
   {
     id: "nome",
-    rotulo: "Nome completo",
+    rotulo: "Seu nome",
     tipo: "texto",
     obrigatorio: true,
     peso: 0,
-    placeholder: "Seu nome",
+    placeholder: "Nome do dentista responsável",
+    grupo: "Seus dados",
+  },
+  {
+    id: "clinica",
+    rotulo: "Nome da sua clínica",
+    tipo: "texto",
+    obrigatorio: true,
+    peso: 0,
+    placeholder: "Como a clínica é conhecida",
     grupo: "Seus dados",
   },
   {
@@ -81,168 +108,106 @@ export const CAMPOS = [
   },
   {
     id: "cidade",
-    rotulo: "Cidade e estado",
+    rotulo: "Cidade e estado da clínica",
     tipo: "texto",
     obrigatorio: true,
     peso: 0,
     placeholder: "São Paulo / SP",
     grupo: "Seus dados",
   },
-  {
-    id: "instagram",
-    rotulo: "Instagram ou site (opcional)",
-    tipo: "texto",
-    obrigatorio: false,
-    peso: 0,
-    placeholder: "@seuperfil",
-    grupo: "Seus dados",
-  },
 
   {
-    id: "area",
-    rotulo: "Qual sua área de atuação hoje?",
-    tipo: "selecao",
-    obrigatorio: true,
-    peso: 1,
-    grupo: "Seu negócio",
-    opcoes: [
-      { valor: "mesmo_setor", rotulo: "Já atuo no mesmo setor que vocês", pontos: 10 },
-      { valor: "setor_proximo", rotulo: "Atuo em um setor parecido / complementar", pontos: 8 },
-      { valor: "vendas", rotulo: "Trabalho com vendas ou comercial em geral", pontos: 6 },
-      { valor: "outro", rotulo: "Outra área", pontos: 3 },
-      { valor: "sem_area", rotulo: "Ainda não atuo profissionalmente", pontos: 0 },
-    ],
-  },
-  {
-    id: "faturamento",
-    rotulo: "Qual seu faturamento médio por mês?",
+    id: "exames_dia",
+    rotulo: "Quantos exames de imagem você pede por dia?",
     tipo: "selecao",
     obrigatorio: true,
     peso: 3,
-    grupo: "Seu negócio",
+    grupo: "Sua clínica",
     opcoes: [
-      { valor: "acima_100k", rotulo: "Acima de R$ 100 mil", pontos: 10 },
-      { valor: "50k_100k", rotulo: "Entre R$ 50 mil e R$ 100 mil", pontos: 9 },
-      { valor: "20k_50k", rotulo: "Entre R$ 20 mil e R$ 50 mil", pontos: 7 },
-      { valor: "5k_20k", rotulo: "Entre R$ 5 mil e R$ 20 mil", pontos: 4 },
-      { valor: "ate_5k", rotulo: "Até R$ 5 mil", pontos: 2 },
-      { valor: "sem_faturamento", rotulo: "Ainda não faturo", pontos: 0 },
+      { valor: "mais_10", rotulo: "Mais de 10 por dia", pontos: 10 },
+      { valor: "6_10", rotulo: "De 6 a 10 por dia", pontos: 9 },
+      { valor: "3_5", rotulo: "De 3 a 5 por dia", pontos: 7 },
+      { valor: "1_2", rotulo: "De 1 a 2 por dia", pontos: 4 },
+      { valor: "poucos", rotulo: "Menos de 1 por dia", pontos: 2 },
+      { valor: "nenhum", rotulo: "Hoje eu não peço exames de imagem", pontos: 0 },
     ],
   },
   {
-    id: "tempo_mercado",
-    rotulo: "Há quanto tempo você está no mercado?",
+    id: "pacientes_semana",
+    rotulo: "Quantos pacientes você atende por semana?",
     tipo: "selecao",
     obrigatorio: true,
-    peso: 1,
-    grupo: "Seu negócio",
+    peso: 3,
+    grupo: "Sua clínica",
     opcoes: [
-      { valor: "mais_5_anos", rotulo: "Mais de 5 anos", pontos: 10 },
-      { valor: "2_5_anos", rotulo: "De 2 a 5 anos", pontos: 8 },
-      { valor: "1_2_anos", rotulo: "De 1 a 2 anos", pontos: 6 },
-      { valor: "menos_1_ano", rotulo: "Menos de 1 ano", pontos: 3 },
-      { valor: "comecando", rotulo: "Estou começando agora", pontos: 1 },
+      { valor: "mais_100", rotulo: "Mais de 100", pontos: 10 },
+      { valor: "51_100", rotulo: "De 51 a 100", pontos: 8 },
+      { valor: "21_50", rotulo: "De 21 a 50", pontos: 6 },
+      { valor: "10_20", rotulo: "De 10 a 20", pontos: 3 },
+      { valor: "menos_10", rotulo: "Menos de 10", pontos: 1 },
     ],
   },
   {
     id: "equipe",
-    rotulo: "Quantas pessoas trabalham com você?",
+    rotulo: "Quantas pessoas trabalham com você na clínica?",
     tipo: "selecao",
     obrigatorio: true,
     peso: 1,
-    grupo: "Seu negócio",
+    grupo: "Sua clínica",
     opcoes: [
       { valor: "mais_10", rotulo: "Mais de 10 pessoas", pontos: 10 },
-      { valor: "4_10", rotulo: "De 4 a 10 pessoas", pontos: 8 },
-      { valor: "2_3", rotulo: "De 2 a 3 pessoas", pontos: 5 },
+      { valor: "6_10", rotulo: "De 6 a 10 pessoas", pontos: 8 },
+      { valor: "3_5", rotulo: "De 3 a 5 pessoas", pontos: 6 },
+      { valor: "2", rotulo: "Somos 2", pontos: 4 },
       { valor: "sozinho", rotulo: "Trabalho sozinho", pontos: 2 },
     ],
   },
   {
-    id: "carteira",
-    rotulo: "Você já tem uma carteira de clientes para indicar?",
+    id: "faturamento",
+    rotulo: "Qual o faturamento médio mensal da clínica?",
     tipo: "selecao",
     obrigatorio: true,
     peso: 2,
-    grupo: "Seu negócio",
+    grupo: "Sua clínica",
     opcoes: [
-      { valor: "mais_50", rotulo: "Sim, mais de 50 clientes", pontos: 10 },
-      { valor: "10_50", rotulo: "Sim, de 10 a 50 clientes", pontos: 8 },
-      { valor: "ate_10", rotulo: "Sim, até 10 clientes", pontos: 5 },
-      { valor: "rede", rotulo: "Não tenho carteira, mas tenho boa rede de contatos", pontos: 4 },
-      { valor: "nenhum", rotulo: "Não tenho", pontos: 0 },
+      { valor: "acima_150k", rotulo: "Acima de R$ 150 mil", pontos: 10 },
+      { valor: "80_150k", rotulo: "De R$ 80 mil a R$ 150 mil", pontos: 9 },
+      { valor: "40_80k", rotulo: "De R$ 40 mil a R$ 80 mil", pontos: 7 },
+      { valor: "15_40k", rotulo: "De R$ 15 mil a R$ 40 mil", pontos: 5 },
+      { valor: "ate_15k", rotulo: "Até R$ 15 mil", pontos: 2 },
+      { valor: "prefiro_nao", rotulo: "Prefiro não informar", pontos: 4 },
     ],
   },
 
   {
-    id: "experiencia",
-    rotulo: "Você já trabalhou como parceiro/revendedor antes?",
+    id: "dificuldade",
+    rotulo: "Qual sua maior dificuldade hoje com exames?",
     tipo: "selecao",
     obrigatorio: true,
     peso: 2,
     grupo: "Sobre a parceria",
     opcoes: [
-      { valor: "sim_resultado", rotulo: "Sim, e tive bons resultados", pontos: 10 },
-      { valor: "sim_pouco", rotulo: "Sim, mas sem resultado expressivo", pontos: 6 },
-      { valor: "nao_conheco", rotulo: "Nunca fui, mas conheço o modelo", pontos: 4 },
-      { valor: "nao", rotulo: "Nunca fui e não conheço", pontos: 1 },
+      { valor: "demora", rotulo: "A demora para receber o laudo", pontos: 10 },
+      { valor: "qualidade", rotulo: "A qualidade da imagem ou do laudo", pontos: 10 },
+      { valor: "contato", rotulo: "Não conseguir falar com quem faz o exame", pontos: 9 },
+      { valor: "distancia", rotulo: "Não ter um laboratório perto da clínica", pontos: 8 },
+      { valor: "preco", rotulo: "O preço para o paciente", pontos: 7 },
+      { valor: "sem_dificuldade", rotulo: "Não tenho dificuldade hoje", pontos: 2 },
     ],
   },
   {
-    id: "investimento",
-    rotulo: "Quanto você pode investir para começar?",
-    tipo: "selecao",
-    obrigatorio: true,
-    peso: 3,
-    grupo: "Sobre a parceria",
-    opcoes: [
-      { valor: "acima_20k", rotulo: "Acima de R$ 20 mil", pontos: 10 },
-      { valor: "10k_20k", rotulo: "De R$ 10 mil a R$ 20 mil", pontos: 9 },
-      { valor: "5k_10k", rotulo: "De R$ 5 mil a R$ 10 mil", pontos: 7 },
-      { valor: "1k_5k", rotulo: "De R$ 1 mil a R$ 5 mil", pontos: 4 },
-      { valor: "ate_1k", rotulo: "Até R$ 1 mil", pontos: 2 },
-      { valor: "nao_posso", rotulo: "Não posso investir agora", pontos: 0 },
-    ],
-  },
-  {
-    id: "dedicacao",
-    rotulo: "Quantas horas por semana você pode dedicar?",
+    id: "objetivo_parceria",
+    rotulo: "O que você procura ao ser parceiro da Omega?",
     tipo: "selecao",
     obrigatorio: true,
     peso: 2,
     grupo: "Sobre a parceria",
     opcoes: [
-      { valor: "integral", rotulo: "Dedicação integral (40h ou mais)", pontos: 10 },
-      { valor: "20_40", rotulo: "De 20 a 40 horas", pontos: 8 },
-      { valor: "10_20", rotulo: "De 10 a 20 horas", pontos: 5 },
-      { valor: "menos_10", rotulo: "Menos de 10 horas", pontos: 2 },
-    ],
-  },
-  {
-    id: "inicio",
-    rotulo: "Quando você quer começar?",
-    tipo: "selecao",
-    obrigatorio: true,
-    peso: 3,
-    grupo: "Sobre a parceria",
-    opcoes: [
-      { valor: "imediato", rotulo: "Imediatamente", pontos: 10 },
-      { valor: "30_dias", rotulo: "Nos próximos 30 dias", pontos: 8 },
-      { valor: "90_dias", rotulo: "Nos próximos 3 meses", pontos: 5 },
-      { valor: "sem_previsao", rotulo: "Sem previsão, só pesquisando", pontos: 0 },
-    ],
-  },
-  {
-    id: "decisor",
-    rotulo: "Você decide sozinho sobre essa parceria?",
-    tipo: "selecao",
-    obrigatorio: true,
-    peso: 2,
-    grupo: "Sobre a parceria",
-    opcoes: [
-      { valor: "sim", rotulo: "Sim, a decisão é minha", pontos: 10 },
-      { valor: "socio", rotulo: "Decido junto com um sócio", pontos: 7 },
-      { valor: "nao", rotulo: "Outra pessoa decide", pontos: 2 },
+      { valor: "recorrencia", rotulo: "Passar a indicar meus exames com recorrência", pontos: 10 },
+      { valor: "prazo", rotulo: "Receber os exames em até 24 horas", pontos: 9 },
+      { valor: "suporte", rotulo: "Falar direto com o time durante o exame", pontos: 8 },
+      { valor: "desconto", rotulo: "Condições e descontos de parceiro", pontos: 7 },
+      { valor: "conhecer", rotulo: "Só estou conhecendo por enquanto", pontos: 1 },
     ],
   },
   {
@@ -253,21 +218,21 @@ export const CAMPOS = [
     peso: 0,
     grupo: "Sobre a parceria",
     opcoes: [
-      { valor: "indicacao", rotulo: "Indicação de um parceiro", pontos: 0 },
+      { valor: "indicacao", rotulo: "Indicação de outro dentista", pontos: 0 },
+      { valor: "representante", rotulo: "Representante da Omega", pontos: 0 },
       { valor: "instagram", rotulo: "Instagram", pontos: 0 },
       { valor: "google", rotulo: "Google", pontos: 0 },
-      { valor: "youtube", rotulo: "YouTube", pontos: 0 },
-      { valor: "evento", rotulo: "Evento", pontos: 0 },
+      { valor: "evento", rotulo: "Congresso ou evento", pontos: 0 },
       { valor: "outro", rotulo: "Outro", pontos: 0 },
     ],
   },
   {
-    id: "objetivo",
-    rotulo: "Conte rapidamente por que quer ser parceiro",
+    id: "observacao",
+    rotulo: "Quer contar mais alguma coisa?",
     tipo: "textarea",
     obrigatorio: false,
     peso: 0,
-    placeholder: "Escreva em poucas linhas...",
+    placeholder: "Tipos de exame que mais pede, o que espera da parceria...",
     grupo: "Sobre a parceria",
   },
 ]
@@ -280,39 +245,38 @@ export const CAMPOS = [
  */
 export const REGRAS = [
   {
-    id: "sem_previsao_e_c",
-    descricao: "Sem previsão para começar: no máximo C",
+    id: "nao_pede_exames",
+    descricao: "Hoje não pede exames de imagem: no máximo C",
     tipo: "limite",
     classe: "C",
-    quando: (r) => r.inicio === "sem_previsao",
+    quando: (r) => r.exames_dia === "nenhum",
   },
   {
-    id: "sem_investimento_maximo_b",
-    descricao: "Não pode investir agora: no máximo B",
+    id: "so_conhecendo",
+    descricao: "Só está conhecendo por enquanto: no máximo B",
     tipo: "limite",
     classe: "B",
-    quando: (r) => r.investimento === "nao_posso",
+    quando: (r) => r.objetivo_parceria === "conhecer",
   },
   {
-    id: "perfil_premium",
-    descricao: "Fatura alto, investe alto e quer começar já: entra como A",
+    id: "volume_alto",
+    descricao: "Pede muitos exames por dia e quer indicar com recorrência: entra como A",
     tipo: "piso",
     classe: "A",
     quando: (r) =>
-      ["acima_100k", "50k_100k"].includes(r.faturamento) &&
-      ["acima_20k", "10k_20k"].includes(r.investimento) &&
-      ["imediato", "30_dias"].includes(r.inicio),
+      ["mais_10", "6_10"].includes(r.exames_dia) &&
+      ["recorrencia", "prazo"].includes(r.objetivo_parceria),
   },
 ]
 
 /** Mensagem sugerida no WhatsApp para cada classe (usada no painel). */
 export const MENSAGENS_WHATSAPP = {
   A: (lead) =>
-    `Oi ${primeiroNome(lead)}! Aqui é do time de parcerias. Vi sua inscrição e seu perfil ficou entre os primeiros da fila. Consegue falar hoje para eu te mostrar como funciona?`,
+    `Oi ${primeiroNome(lead)}! Aqui é do time da Omega Diagnóstico Odontológico. Recebi sua inscrição de parceria${daClinica(lead)} e queria te mostrar hoje como funciona o envio dos exames, o laudo em 24 horas e as condições de parceiro. Consegue falar agora?`,
   B: (lead) =>
-    `Oi ${primeiroNome(lead)}! Aqui é do time de parcerias. Recebemos sua inscrição e queria entender melhor seu momento para te indicar o melhor caminho. Pode me contar um pouco mais?`,
+    `Oi ${primeiroNome(lead)}! Aqui é do time da Omega Diagnóstico Odontológico. Recebi sua inscrição de parceria${daClinica(lead)} e queria entender melhor como funcionam seus exames hoje para te mostrar o que faz sentido. Pode me contar um pouco?`,
   C: (lead) =>
-    `Oi ${primeiroNome(lead)}! Aqui é do time de parcerias. Obrigado pela inscrição! Vou te mandar nossos materiais para você acompanhar e, quando fizer sentido, a gente retoma a conversa.`,
+    `Oi ${primeiroNome(lead)}! Aqui é do time da Omega Diagnóstico Odontológico. Obrigado pela inscrição${daClinica(lead)}! Vou te mandar nossos materiais e, quando precisar de um exame, é só me chamar por aqui.`,
 }
 
 function primeiroNome(lead) {
@@ -320,16 +284,21 @@ function primeiroNome(lead) {
   return nome.split(/\s+/)[0] || "tudo bem"
 }
 
+function daClinica(lead) {
+  const clinica = String(lead?.respostas?.clinica || "").trim()
+  return clinica ? ` da ${clinica}` : ""
+}
+
 /**
  * Apelidos aceitos no webhook, para quando o formulário externo
  * usa outro nome de campo (ex.: "full_name" vira "nome").
  */
 export const APELIDOS_WEBHOOK = {
-  nome: ["nome", "name", "full_name", "nome_completo", "seu_nome"],
+  nome: ["nome", "name", "full_name", "nome_completo", "seu_nome", "dentista"],
+  clinica: ["clinica", "clinic", "consultorio", "nome_clinica", "empresa"],
   email: ["email", "e_mail", "e-mail", "mail"],
   whatsapp: ["whatsapp", "telefone", "phone", "celular", "fone", "tel"],
   cidade: ["cidade", "city", "cidade_estado", "localizacao"],
-  instagram: ["instagram", "site", "perfil", "url"],
 }
 
 /** Lista de campos que pontuam, usada pelo classificador. */

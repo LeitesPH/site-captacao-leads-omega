@@ -8,19 +8,16 @@ import { classificar } from "../src/classificador.js"
 
 const BASE = {
   nome: "Teste",
+  clinica: "Clinica Teste",
   email: "teste@exemplo.com",
   whatsapp: "(11) 98888-7777",
   cidade: "Sao Paulo / SP",
-  area: "mesmo_setor",
-  faturamento: "50k_100k",
-  tempo_mercado: "2_5_anos",
-  equipe: "4_10",
-  carteira: "10_50",
-  experiencia: "sim_resultado",
-  investimento: "10k_20k",
-  dedicacao: "integral",
-  inicio: "imediato",
-  decisor: "sim",
+  exames_dia: "6_10",
+  pacientes_semana: "51_100",
+  equipe: "6_10",
+  faturamento: "80_150k",
+  dificuldade: "demora",
+  objetivo_parceria: "recorrencia",
   origem: "indicacao",
 }
 
@@ -43,19 +40,19 @@ test("so entra como ponto forte quem chegou perto do maximo da pergunta", () => 
 })
 
 test("a resposta pior pontuada aparece entre os pontos de atencao", () => {
-  const { pontosFracos } = classificar({ ...BASE, investimento: "nao_posso" })
-  assert.ok(pontosFracos.some((p) => p.campo === "investimento"))
+  const { pontosFracos } = classificar({ ...BASE, faturamento: "ate_15k" })
+  assert.ok(pontosFracos.some((p) => p.campo === "faturamento"))
 })
 
 test("perfil perfeito nao tem pontos de atencao", () => {
   const { pontosFortes, pontosFracos } = classificar({
     ...BASE,
-    area: "mesmo_setor",
-    faturamento: "acima_100k",
-    tempo_mercado: "mais_5_anos",
+    exames_dia: "mais_10",
+    pacientes_semana: "mais_100",
     equipe: "mais_10",
-    carteira: "mais_50",
-    investimento: "acima_20k",
+    faturamento: "acima_150k",
+    dificuldade: "demora",
+    objetivo_parceria: "recorrencia",
   })
   assert.equal(pontosFracos.length, 0)
   assert.equal(pontosFortes.length, 3)

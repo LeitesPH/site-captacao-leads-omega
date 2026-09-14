@@ -1068,9 +1068,8 @@ tbody tr:last-child td {
 /* ==========================================================================
    MARCA OMEGA
    A logo sempre aparece sobre a faixa azul-marinho, por isso é branca.
-   Para usar o arquivo oficial da Omega, troque publico/logo-omega.svg
-   (mesmo nome) e, se ele já vier com a palavra "omega" desenhada,
-   remova o bloco .logo-lockup-texto do HTML.
+   O arquivo publico/logo-omega.svg já é o oficial da Omega, com símbolo,
+   nome e assinatura no mesmo desenho.
    ========================================================================== */
 
 .faixa-marca {
@@ -1097,44 +1096,16 @@ tbody tr:last-child td {
   flex: none;
 }
 
+/* A logo e um arquivo so, ja com simbolo, nome e assinatura.
+   Altura manda; a largura vem da proporcao do arquivo (cerca de 3,8 : 1). */
 .logo-omega img {
-  width: 46px;
-  height: 41px;
   display: block;
-}
-
-.logo-lockup-texto {
-  display: grid;
-  line-height: 1.05;
-}
-
-.logo-lockup-texto .nome {
-  font-family: var(--fonte-titulo);
-  font-weight: 700;
-  font-size: 1.45rem;
-  letter-spacing: -0.01em;
-  color: #ffffff;
-}
-
-.logo-lockup-texto .assinatura {
-  font-family: var(--fonte);
-  font-weight: 300;
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.82);
+  height: 34px;
+  width: auto;
 }
 
 .logo-omega--grande img {
-  width: 68px;
-  height: 60px;
-}
-
-.logo-omega--grande .logo-lockup-texto .nome {
-  font-size: 2.1rem;
-}
-
-.logo-omega--grande .logo-lockup-texto .assinatura {
-  font-size: 0.78rem;
+  height: 58px;
 }
 
 /* Botões que ficam em cima da faixa azul */
@@ -1214,11 +1185,10 @@ tbody tr:last-child td {
 
 @media (max-width: 700px) {
   .logo-omega img {
-    width: 38px;
-    height: 34px;
+    height: 24px;
   }
 
-  .logo-lockup-texto .nome {
-    font-size: 1.2rem;
+  .logo-omega--grande img {
+    height: 44px;
   }
 }

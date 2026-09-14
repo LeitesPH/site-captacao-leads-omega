@@ -1,7 +1,9 @@
-# Captação e separação de leads A / B / C
+# Captação e separação de leads A / B / C — Omega
 
-Um site de **inscrição para parceria** que recebe as pessoas interessadas, dá uma nota
-para cada uma com base nas respostas e **separa automaticamente em Lead A, Lead B e Lead C**.
+Um site de **inscrição para o programa de parceria da Omega Diagnóstico Odontológico**.
+O parceiro é o **dentista que passa a indicar exames de imagem para a Omega com
+recorrência**. O site recebe as inscrições, dá uma nota para cada dentista com base nas
+respostas e **separa automaticamente em Lead A, Lead B e Lead C**.
 
 São duas telas:
 
@@ -80,8 +82,8 @@ Com o site **parado**, rode:
 npm run exemplo
 ```
 
-Isso cria 8 inscrições fictícias, já separadas em A, B e C. Para limpar depois,
-apague o arquivo `dados/leads.json`.
+Isso cria 8 inscrições fictícias de dentistas, já separadas em A, B e C. Para limpar
+depois, apague o arquivo `dados/leads.json`.
 
 ---
 
@@ -142,16 +144,23 @@ As cores ficam todas no começo do arquivo `publico/css/estilo.css`, no bloco
 `IDENTIDADE OMEGA`. Trocar a marca do site para outro cliente é trocar aquelas
 linhas e o arquivo do logo — o resto do site se ajusta sozinho.
 
-### Trocando o logo pelo arquivo oficial
+### O arquivo do logo
 
-O arquivo `publico/logo-omega.svg` é um **desenho aproximado** do símbolo, feito a
-partir do manual de marca. Quando a Omega te mandar o arquivo oficial:
+`publico/logo-omega.svg` é o **arquivo oficial da Omega**, com símbolo, nome e
+assinatura no mesmo desenho. Ele passou por dois ajustes em relação ao arquivo
+recebido:
 
-1. Salve o arquivo oficial como `publico/logo-omega.svg` (mesmo nome), numa versão
-   **branca**, porque o logo sempre aparece sobre a faixa azul-marinho.
-2. Se o arquivo oficial já vier com a palavra "omega" desenhada, remova o bloco
-   `<span class="logo-lockup-texto">…</span>` das três páginas em `publico/`,
-   senão o nome aparece duas vezes.
+1. O original desenhava a logo como o **buraco de uma chapa preta**. A chapa foi
+   removida usando o próprio desenho como máscara, então sobrou só a logo, com
+   fundo transparente de verdade.
+2. O enquadramento foi fechado no desenho, tirando a margem vazia que sobrava em
+   volta (o arquivo tinha mais que o dobro da altura necessária).
+
+O logo sai **branco** porque no site ele sempre aparece sobre a faixa azul-marinho.
+Para uma versão em outra cor, troque o `fill` do retângulo no fim do arquivo.
+
+No CSS a **altura** manda e a largura vem da proporção (cerca de 3,8 : 1) — mexa em
+`.logo-omega img` se quiser maior ou menor.
 
 O logo aparece em três lugares: no topo do formulário público, no topo do painel
 (canto superior esquerdo) e na tela de login.
@@ -175,9 +184,21 @@ Nota de 0 a 100  →  70 ou mais = Lead A
                  →  abaixo de 45 = Lead C
 ```
 
-As perguntas que mais pesam hoje são **faturamento**, **quanto pode investir** e
-**quando quer começar** (peso 3 cada). As que menos pesam são tempo de mercado e
-tamanho da equipe (peso 1).
+O que mais pesa é **volume de exames**, porque é isso que a parceria gera na prática:
+
+| Pergunta | Peso |
+| --- | --- |
+| Quantos exames de imagem você pede por dia? | 3 |
+| Quantos pacientes você atende por semana? | 3 |
+| Qual o faturamento médio mensal da clínica? | 2 |
+| Qual sua maior dificuldade hoje com exames? | 2 |
+| O que você procura ao ser parceiro da Omega? | 2 |
+| Quantas pessoas trabalham com você na clínica? | 1 |
+
+As duas últimas perguntas medem **encaixe**, não tamanho: quem responde que a dor é a
+demora do laudo ou a qualidade da imagem pontua alto, porque é exatamente o que a Omega
+resolve. Quem responde que não tem dificuldade nenhuma pontua baixo — não há motivo
+para essa pessoa trocar de laboratório.
 
 ### As regras que passam por cima da nota
 
@@ -185,13 +206,13 @@ Algumas respostas são decisivas, não importa o resto. Por isso existem três r
 
 | Regra | O que faz |
 | --- | --- |
-| Marcou "sem previsão, só pesquisando" | Vai para **C**, mesmo com nota alta |
-| Marcou "não posso investir agora" | No máximo **B** |
-| Fatura alto + investe alto + quer começar já | Entra como **A**, mesmo com nota baixa |
+| Marcou "hoje eu não peço exames de imagem" | Vai para **C**, mesmo com nota alta |
+| Marcou "só estou conhecendo por enquanto" | No máximo **B** |
+| Pede mais de 6 exames por dia + quer indicar com recorrência | Entra como **A** |
 
-Exemplo real: alguém que fatura mais de R$ 100 mil e tem equipe grande tira nota 93,
-mas se marcar "sem previsão para começar" vai para a coluna C — porque não adianta o
-time comercial gastar energia com quem não vai decidir agora.
+Exemplo real: um dentista com clínica grande, muitos pacientes e faturamento alto tira
+nota 100, mas se marcar que hoje não pede exames de imagem vai para a coluna C — porque
+uma clínica que não pede exame não gera parceria, por maior que ela seja.
 
 No painel, cada lead mostra **por que** ficou naquela classe, com a nota e a regra que
 foi aplicada. Ninguém precisa confiar na caixa-preta.
@@ -210,8 +231,8 @@ tempo — você não precisa mexer em mais nada.
 Procure a pergunta e mude o número em `pontos`:
 
 ```js
-{ valor: "acima_100k", rotulo: "Acima de R$ 100 mil", pontos: 10 },
-{ valor: "50k_100k",  rotulo: "Entre R$ 50 mil e R$ 100 mil", pontos: 9 },
+{ valor: "mais_10", rotulo: "Mais de 10 por dia", pontos: 10 },
+{ valor: "6_10",    rotulo: "De 6 a 10 por dia",  pontos: 9 },
 ```
 
 ### Mudar o quanto uma pergunta importa
@@ -220,8 +241,8 @@ Mude o `peso` da pergunta (0 = só coleta a informação e não pontua):
 
 ```js
 {
-  id: "faturamento",
-  rotulo: "Qual seu faturamento médio por mês?",
+  id: "exames_dia",
+  rotulo: "Quantos exames de imagem você pede por dia?",
   peso: 3,        // <- de 0 a 3, quanto maior mais importa
   ...
 }
@@ -307,17 +328,18 @@ e o corpo em JSON. O sistema entende nomes de campo em português e em inglês �
 ```json
 {
   "full_name": "Maria Souza",
+  "clinic": "Clínica Souza",
   "email": "maria@exemplo.com",
   "phone": "(11) 98888-7777",
   "cidade": "São Paulo / SP",
-  "faturamento": "50k_100k",
-  "investimento": "10k_20k",
-  "inicio": "imediato"
+  "exames_dia": "6_10",
+  "pacientes_semana": "51_100",
+  "objetivo_parceria": "recorrencia"
 }
 ```
 
 Os valores das perguntas de múltipla escolha precisam ser os códigos que estão em
-`src/criterios.js` (por exemplo `50k_100k`, e não "Entre R$ 50 mil e R$ 100 mil").
+`src/criterios.js` (por exemplo `6_10`, e não "De 6 a 10 por dia").
 
 O lead entra classificado do mesmo jeito, e no painel aparece com origem "webhook".
 
