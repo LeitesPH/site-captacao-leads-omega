@@ -14,6 +14,7 @@ import { tratarApi } from "./src/rotas.js"
 import { redirecionar, responderTexto, servirEstatico } from "./src/http.js"
 import { estaLogado } from "./src/sessao.js"
 import { aguardarGravacoes } from "./src/db.js"
+import { garantirContaInicial, listarUsuarios } from "./src/usuarios.js"
 
 const PASTA_PUBLICA = path.join(RAIZ, "publico")
 
@@ -46,6 +47,8 @@ const servidor = http.createServer(async (req, res) => {
   }
 })
 
+const contaCriada = garantirContaInicial()
+
 servidor.listen(config.porta, () => {
   const linha = "─".repeat(58)
   console.log(`\n${linha}`)
@@ -54,7 +57,19 @@ servidor.listen(config.porta, () => {
   console.log(`  Formulario publico : http://localhost:${config.porta}`)
   console.log(`  Painel de leads    : http://localhost:${config.porta}/painel`)
   console.log(`  Base de dados      : ${config.arquivoLeads}`)
+  console.log(`  Contas com acesso   : ${listarUsuarios().length}`)
   console.log(linha)
+
+  if (contaCriada) {
+    console.log("  Primeira execução: criei a conta de acesso ao painel.")
+    console.log(`     login: ${contaCriada.login}`)
+    console.log(`     senha: ${contaCriada.senha}`)
+    if (contaCriada.sorteada) {
+      console.log("     (senha sorteada, anote agora - ela não aparece de novo)")
+    }
+    console.log(linha)
+  }
+
   for (const aviso of avisosDeConfiguracao()) {
     console.log(`  ⚠  ${aviso}`)
   }

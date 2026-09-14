@@ -6,29 +6,53 @@
     <title>Entrar no painel</title>
     <meta name="robots" content="noindex" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/fontes.css" />
     <link rel="stylesheet" href="/css/estilo.css" />
   </head>
   <body>
     <div class="tela-login">
-      <div class="cartao caixa-login">
-        <div class="marca" style="margin-bottom: 20px">
-          <span class="marca-icone">P</span>
-          <span>Painel de leads</span>
+      <div>
+        <div class="login-marca">
+          <span class="logo-omega logo-omega--grande">
+            <img src="/logo-omega.svg" alt="Omega" width="68" height="60" />
+            <span class="logo-lockup-texto">
+              <span class="nome">omega</span>
+              <span class="assinatura">Diagnóstico Odontológico</span>
+            </span>
+          </span>
         </div>
-        <h1>Entrar</h1>
-        <p>Área restrita ao time comercial.</p>
+
+        <div class="cartao caixa-login">
+        <h1>Painel de leads</h1>
+        <p>Área restrita. Use o login e a senha que você recebeu.</p>
 
         <form id="formulario-login">
           <div class="campo">
+            <label for="usuario">Login</label>
+            <input
+              type="text"
+              id="usuario"
+              name="usuario"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              autofocus
+            />
+          </div>
+
+          <div class="campo">
             <label for="senha">Senha</label>
-            <input type="password" id="senha" name="senha" autocomplete="current-password" autofocus />
+            <input type="password" id="senha" name="senha" autocomplete="current-password" />
             <span class="mensagem-erro" id="erro"></span>
           </div>
+
           <button class="botao" type="submit" style="width: 100%" id="botao">Entrar</button>
         </form>
 
-        <p style="margin-top: 22px; text-align: center; font-size: 0.85rem">
-          <a href="/">Voltar para o site</a>
+        </div>
+
+        <p class="rodape-login">
+          <a href="/">Voltar para o formulário de inscrição</a>
         </p>
       </div>
     </div>
@@ -45,16 +69,25 @@
       formulario.addEventListener("submit", async (evento) => {
         evento.preventDefault()
         erro.textContent = ""
+
+        const usuario = document.getElementById("usuario").value.trim()
+        const senha = document.getElementById("senha").value
+
+        if (!usuario || !senha) {
+          erro.textContent = "Preencha o login e a senha."
+          return
+        }
+
         botao.disabled = true
         botao.textContent = "Entrando..."
+
         try {
-          await pedir("/api/login", {
-            method: "POST",
-            corpo: { senha: document.getElementById("senha").value },
-          })
+          await pedir("/api/login", { method: "POST", corpo: { usuario, senha } })
           window.location.href = "/painel"
         } catch (falha) {
           erro.textContent = falha.message || "Não consegui entrar."
+          document.getElementById("senha").value = ""
+          document.getElementById("senha").focus()
           botao.disabled = false
           botao.textContent = "Entrar"
         }

@@ -4,63 +4,75 @@
    ========================================================================== */
 
 :root {
-  --fundo: #f6f7f9;
+  /* ---------------------------------------------------------------
+     IDENTIDADE OMEGA
+     Azul-marinho #00043B, dourado #D3AF37, branco.
+     Títulos em Montserrat, textos em Poppins.
+     Trocar a marca do site é trocar estas linhas.
+     --------------------------------------------------------------- */
+  --marinho: #00043b;
+  --marinho-2: #0a1050;
+  --marinho-3: #141b63;
+  --ouro: #d3af37;
+  --ouro-escuro: #b8942a;
+
+  --fundo: #f4f6fb;
   --fundo-suave: #ffffff;
   --cartao: #ffffff;
-  --texto: #0f172a;
-  --texto-suave: #64748b;
-  --borda: #e2e8f0;
-  --borda-forte: #cbd5e1;
+  --texto: #00043b;
+  --texto-suave: #5a6480;
+  --borda: #e0e4ef;
+  --borda-forte: #c6cddf;
 
-  --marca: #0f9d58;
-  --marca-forte: #0b7a43;
-  --marca-suave: #e7f6ee;
-  --marca-contraste: #ffffff;
+  --marca: var(--ouro);
+  --marca-forte: var(--ouro-escuro);
+  --marca-suave: #fbf3da;
+  --marca-contraste: #00043b;
 
-  --classe-a: #0f9d58;
-  --classe-a-fundo: #e7f6ee;
-  --classe-b: #b45309;
-  --classe-b-fundo: #fdf1e0;
-  --classe-c: #475569;
-  --classe-c-fundo: #eef1f5;
+  --classe-a: #1f8f5c;
+  --classe-a-fundo: #e4f4ec;
+  --classe-b: #97741a;
+  --classe-b-fundo: #fbf3da;
+  --classe-c: #4a5878;
+  --classe-c-fundo: #eaedf5;
 
-  --perigo: #dc2626;
-  --perigo-fundo: #fdeaea;
+  --perigo: #c0281f;
+  --perigo-fundo: #fbe9e8;
 
-  --sombra: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
-  --sombra-forte: 0 12px 40px rgba(15, 23, 42, 0.16);
+  --sombra: 0 1px 2px rgba(0, 4, 59, 0.06), 0 8px 24px rgba(0, 4, 59, 0.08);
+  --sombra-forte: 0 12px 40px rgba(0, 4, 59, 0.24);
   --raio: 12px;
   --raio-g: 18px;
-  --fonte: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  --fonte: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --fonte-titulo: "Montserrat", var(--fonte);
 }
 
 [data-tema="escuro"] {
-  --fundo: #0b1020;
-  --fundo-suave: #111827;
-  --cartao: #151c2e;
-  --texto: #e8edf6;
-  --texto-suave: #93a1b8;
-  --borda: #25304a;
-  --borda-forte: #33415f;
+  --fundo: #00043b;
+  --fundo-suave: #060b4a;
+  --cartao: #0a1050;
+  --texto: #eef1f8;
+  --texto-suave: #9aa5c4;
+  --borda: #1c2470;
+  --borda-forte: #2c3690;
 
-  --marca: #2ecc80;
-  --marca-forte: #24b370;
-  --marca-suave: #12291f;
-  --marca-contraste: #04120b;
+  --marca: var(--ouro);
+  --marca-forte: #e0be4b;
+  --marca-suave: #2a2413;
+  --marca-contraste: #00043b;
 
-  --classe-a: #2ecc80;
-  --classe-a-fundo: #12291f;
-  --classe-b: #f0b45f;
-  --classe-b-fundo: #2c2114;
-  --classe-c: #9fb0cc;
-  --classe-c-fundo: #1b2338;
+  --classe-a: #3fc182;
+  --classe-a-fundo: #0c2e20;
+  --classe-b: #e2be4c;
+  --classe-b-fundo: #2e2712;
+  --classe-c: #9fb0d4;
+  --classe-c-fundo: #151d5c;
 
-  --perigo: #f87171;
-  --perigo-fundo: #2c1618;
+  --perigo: #f08a80;
+  --perigo-fundo: #35131a;
 
-  --sombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
-  --sombra-forte: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --sombra: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --sombra-forte: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -80,6 +92,8 @@ h1,
 h2,
 h3,
 h4 {
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
   line-height: 1.2;
   margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
@@ -1048,5 +1062,163 @@ tbody tr:last-child td {
 
   .linha-dupla {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   MARCA OMEGA
+   A logo sempre aparece sobre a faixa azul-marinho, por isso é branca.
+   Para usar o arquivo oficial da Omega, troque publico/logo-omega.svg
+   (mesmo nome) e, se ele já vier com a palavra "omega" desenhada,
+   remova o bloco .logo-lockup-texto do HTML.
+   ========================================================================== */
+
+.faixa-marca {
+  background: var(--marinho);
+  border-bottom: 2px solid var(--ouro);
+}
+
+.faixa-conteudo {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo-omega {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffff;
+  text-decoration: none;
+  flex: none;
+}
+
+.logo-omega img {
+  width: 46px;
+  height: 41px;
+  display: block;
+}
+
+.logo-lockup-texto {
+  display: grid;
+  line-height: 1.05;
+}
+
+.logo-lockup-texto .nome {
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  font-size: 1.45rem;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.logo-lockup-texto .assinatura {
+  font-family: var(--fonte);
+  font-weight: 300;
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.logo-omega--grande img {
+  width: 68px;
+  height: 60px;
+}
+
+.logo-omega--grande .logo-lockup-texto .nome {
+  font-size: 2.1rem;
+}
+
+.logo-omega--grande .logo-lockup-texto .assinatura {
+  font-size: 0.78rem;
+}
+
+/* Botões que ficam em cima da faixa azul */
+.faixa-marca .botao--secundario,
+.topo-painel .botao--secundario {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.faixa-marca .botao--secundario:hover,
+.topo-painel .botao--secundario:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Topo do painel, na cor da marca ---------- */
+
+.topo-painel {
+  background: var(--marinho);
+  border-bottom: 2px solid var(--ouro);
+  color: #ffffff;
+}
+
+.topo-painel .abas {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.topo-painel .abas button {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.topo-painel .abas button.ativa {
+  background: var(--ouro);
+  color: var(--marinho);
+  box-shadow: none;
+}
+
+.topo-painel .etiqueta--neutra {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ---------- Tela de login com a cara da marca ---------- */
+
+.tela-login {
+  background: var(--marinho);
+  background-image: radial-gradient(
+    circle at 50% 0%,
+    rgba(211, 175, 55, 0.16),
+    transparent 62%
+  );
+}
+
+.login-marca {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 26px;
+}
+
+.caixa-login {
+  border-top: 3px solid var(--ouro);
+}
+
+.rodape-login {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rodape-login a {
+  color: var(--ouro);
+}
+
+@media (max-width: 700px) {
+  .logo-omega img {
+    width: 38px;
+    height: 34px;
+  }
+
+  .logo-lockup-texto .nome {
+    font-size: 1.2rem;
   }
 }

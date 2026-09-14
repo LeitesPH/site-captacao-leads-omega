@@ -32,7 +32,6 @@ async function iniciar() {
   const { nomePrograma, textos, campos } = configuracao
 
   document.title = `${textos.tituloFormulario} · ${nomePrograma}`
-  document.getElementById("nome-programa").textContent = nomePrograma
   for (const no of document.querySelectorAll(".nome-programa-rodape")) {
     no.textContent = nomePrograma
   }

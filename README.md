@@ -21,6 +21,8 @@ chamar a pessoa no WhatsApp com uma mensagem já escrita e exportar tudo para Ex
 ## Índice
 
 - [Como rodar em 3 passos](#como-rodar-em-3-passos)
+- [Contas de acesso ao painel](#contas-de-acesso-ao-painel)
+- [A identidade visual da Omega](#a-identidade-visual-da-omega)
 - [Como funciona a separação A / B / C](#como-funciona-a-separação-a--b--c)
 - [Como mudar as perguntas e os critérios](#como-mudar-as-perguntas-e-os-critérios)
 - [Usando o painel no dia a dia](#usando-o-painel-no-dia-a-dia)
@@ -47,11 +49,15 @@ Abra o `.env` num editor de texto e ajuste:
 
 ```
 PORTA=3000
-SENHA_PAINEL=uma-senha-forte-sua
+USUARIO_INICIAL=admin
+SENHA_INICIAL=uma-senha-forte-sua
 TOKEN_WEBHOOK=um-texto-secreto-qualquer
-NOME_PROGRAMA=Programa de Parceria da Minha Empresa
+NOME_PROGRAMA=Programa de Parceria da Omega
 WHATSAPP_CONTATO=5511999999999
 ```
+
+Se deixar `SENHA_INICIAL` em branco, o site sorteia uma senha forte e mostra
+no terminal na primeira vez que sobe. Anote, porque ela não aparece de novo.
 
 **2. Ligue o site:**
 
@@ -62,7 +68,7 @@ npm start
 **3. Abra no navegador:**
 
 - Formulário público: <http://localhost:3000>
-- Painel de leads: <http://localhost:3000/painel> (entre com a senha do `.env`)
+- Painel de leads: <http://localhost:3000/painel> (entre com o login e a senha)
 
 Para parar o site, aperte `Ctrl + C` no terminal.
 
@@ -76,6 +82,85 @@ npm run exemplo
 
 Isso cria 8 inscrições fictícias, já separadas em A, B e C. Para limpar depois,
 apague o arquivo `dados/leads.json`.
+
+---
+
+## Contas de acesso ao painel
+
+O painel não abre sem login. Cada pessoa entra com o **próprio usuário e senha**,
+e o painel mostra no canto superior direito quem está usando.
+
+**As senhas nunca são guardadas como texto.** O site guarda um *hash* (scrypt com
+sal aleatório): mesmo abrindo o arquivo `dados/usuarios.json`, ninguém lê a senha
+de ninguém — só dá para conferir se uma senha digitada bate. Se algum dia esse
+arquivo vazar, as senhas continuam inúteis.
+
+### Os dois níveis
+
+| Papel | O que pode fazer |
+| --- | --- |
+| `admin` | Tudo, inclusive excluir leads |
+| `vendedor` | Ver, atender, mudar status e anotar — **não** pode excluir |
+
+### Gerenciando as contas
+
+Com o site **parado**:
+
+```bash
+node ferramentas/contas.js listar
+node ferramentas/contas.js criar joao senha-do-joao vendedor "João da Silva"
+node ferramentas/contas.js senha joao nova-senha-do-joao
+node ferramentas/contas.js remover joao
+```
+
+Quando alguém sai da empresa, você remove só aquela conta — ninguém mais precisa
+trocar de senha. E como cada alteração de lead fica registrada com o nome de quem
+fez, o histórico de cada lead mostra quem mudou o status ou moveu de coluna.
+
+### Sobre a sessão
+
+O login vale por 12 horas e viaja num cookie assinado: editar o cookie para tentar
+virar outro usuário quebra a assinatura e o acesso cai. O cookie é `HttpOnly`
+(nenhum script da página consegue lê-lo) e ganha a marca `Secure` automaticamente
+quando o site é acessado por `https` — em `http` local ele fica sem, para você
+conseguir testar na sua máquina.
+
+---
+
+## A identidade visual da Omega
+
+O site já vem com as cores e as fontes da Omega:
+
+| Item | Valor |
+| --- | --- |
+| Azul-marinho | `#00043B` |
+| Dourado | `#D3AF37` |
+| Títulos | Montserrat |
+| Textos | Poppins |
+
+As cores ficam todas no começo do arquivo `publico/css/estilo.css`, no bloco
+`IDENTIDADE OMEGA`. Trocar a marca do site para outro cliente é trocar aquelas
+linhas e o arquivo do logo — o resto do site se ajusta sozinho.
+
+### Trocando o logo pelo arquivo oficial
+
+O arquivo `publico/logo-omega.svg` é um **desenho aproximado** do símbolo, feito a
+partir do manual de marca. Quando a Omega te mandar o arquivo oficial:
+
+1. Salve o arquivo oficial como `publico/logo-omega.svg` (mesmo nome), numa versão
+   **branca**, porque o logo sempre aparece sobre a faixa azul-marinho.
+2. Se o arquivo oficial já vier com a palavra "omega" desenhada, remova o bloco
+   `<span class="logo-lockup-texto">…</span>` das três páginas em `publico/`,
+   senão o nome aparece duas vezes.
+
+O logo aparece em três lugares: no topo do formulário público, no topo do painel
+(canto superior esquerdo) e na tela de login.
+
+### As fontes são servidas pelo próprio site
+
+Montserrat e Poppins estão em `publico/fontes/`, e não são puxadas do Google. Isso
+tem duas vantagens: o site não depende de um serviço de fora para abrir bonito, e o
+IP de quem visita não é enviado ao Google — o que evita uma discussão de LGPD.
 
 ---
 
@@ -246,16 +331,17 @@ O projeto é um servidor Node comum, então roda em qualquer lugar que aceite No
 Na hospedagem, configure:
 
 - **Comando de start:** `npm start`
-- **Variáveis de ambiente:** as mesmas do `.env` (`SENHA_PAINEL`, `TOKEN_WEBHOOK`,
-  `NOME_PROGRAMA`, `WHATSAPP_CONTATO`). A porta normalmente é definida pela hospedagem
-  sozinha — o sistema aceita tanto `PORTA` quanto `PORT`.
+- **Variáveis de ambiente:** as mesmas do `.env` (`USUARIO_INICIAL`, `SENHA_INICIAL`,
+  `TOKEN_WEBHOOK`, `NOME_PROGRAMA`, `WHATSAPP_CONTATO`). A porta normalmente é definida
+  pela hospedagem sozinha — o sistema aceita tanto `PORTA` quanto `PORT`.
 - **Disco:** os leads são gravados na pasta `dados/`. Em hospedagens que apagam os
   arquivos a cada deploy, aponte a variável `PASTA_DADOS` para um disco permanente,
   senão você perde os leads na próxima publicação.
 
 ### Antes de divulgar o link, confira:
 
-- [ ] Troquei a `SENHA_PAINEL` (o painel avisa em amarelo se ainda estiver a padrão)
+- [ ] Criei as contas de verdade e removi a conta de teste
+- [ ] Cada pessoa tem a própria conta (ninguém compartilha login)
 - [ ] O site está em **https** (a hospedagem normalmente cuida disso)
 - [ ] A pasta `dados/` está num disco que não some entre deploys
 - [ ] Fiz uma inscrição de teste e ela apareceu no painel
@@ -283,7 +369,7 @@ Não. Os leads ficam num arquivo JSON. Para o volume de um programa de parcerias
 (milhares de inscrições) isso funciona bem e simplifica muito a vida.
 
 **Duas pessoas podem usar o painel ao mesmo tempo?**
-Podem. Todos entram com a mesma senha.
+Podem, cada uma com a própria conta.
 
 **E se a mesma pessoa se inscrever duas vezes?**
 O sistema reconhece pelo e-mail ou pelo WhatsApp, não cria lead duplicado e registra no
@@ -311,6 +397,7 @@ src/
   criterios.js             PERGUNTAS, PESOS E FAIXAS  <- é aqui que se mexe
   classificador.js         calcula a nota, aplica as regras e explica o resultado
   db.js                    lê e grava o arquivo de leads
+  usuarios.js              contas de acesso e hash das senhas
   rotas.js                 todas as rotas da API
   sessao.js                login do painel (cookie assinado)
   http.js                  utilidades de HTTP e o limitador anti-spam
@@ -319,10 +406,14 @@ publico/
   index.html               formulário de inscrição
   painel.html              painel de leads
   entrar.html              tela de login
-  css/estilo.css           todo o visual
+  logo-omega.svg           símbolo da marca (troque pelo oficial)
+  css/estilo.css           todo o visual, com as cores da Omega no topo
+  css/fontes.css           Montserrat e Poppins, servidas pelo próprio site
+  fontes/                  arquivos .woff2 das fontes
   js/                      formulario.js, painel.js e comum.js
 testes/                    testes automatizados (npm test)
 ferramentas/
+  contas.js                cria, lista e remove contas de acesso
   dados-exemplo.js         cria leads fictícios para demonstração
 ```
 
@@ -352,7 +443,7 @@ Do painel (exigem login):
 
 | Rota | O que faz |
 | --- | --- |
-| `POST /api/login` · `POST /api/logout` · `GET /api/sessao` | Sessão |
+| `POST /api/login` (`{usuario, senha}`) · `POST /api/logout` · `GET /api/sessao` | Sessão |
 | `GET /api/leads` | Lista com filtros: `classe`, `status`, `origem`, `busca`, `dias`, `ordenar` |
 | `GET /api/leads/:id` · `PATCH /api/leads/:id` · `DELETE /api/leads/:id` | Um lead |
 | `GET /api/metricas` | Números do topo do painel |

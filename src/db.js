@@ -135,17 +135,20 @@ export function criarLead({ respostas, analise, origem = "site" }) {
  * Atualiza campos editaveis pelo painel.
  * @param {string} id
  * @param {{classe?:string, status?:string, observacoes?:string, tags?:string[]}} mudancas
+ * @param {{login:string, nome?:string}|null} porQuem quem esta logado, para o historico
  */
-export function atualizarLead(id, mudancas) {
+export function atualizarLead(id, mudancas, porQuem = null) {
   const lead = buscarPorId(id)
   if (!lead) return null
   const agora = new Date().toISOString()
+  const quem = porQuem?.nome || porQuem?.login || null
 
   if (mudancas.classe && mudancas.classe !== lead.classe) {
     lead.historico.push({
       em: agora,
       acao: "classe",
-      detalhe: `Movido de ${lead.classe} para ${mudancas.classe}`,
+      por: quem,
+      detalhe: `Movido de ${lead.classe} para ${mudancas.classe}${quem ? ` por ${quem}` : ""}`,
     })
     lead.classe = mudancas.classe
     lead.classe_manual = mudancas.classe !== lead.classe_automatica
@@ -155,7 +158,8 @@ export function atualizarLead(id, mudancas) {
     lead.historico.push({
       em: agora,
       acao: "status",
-      detalhe: `Status: ${lead.status} -> ${mudancas.status}`,
+      por: quem,
+      detalhe: `Status: ${lead.status} -> ${mudancas.status}${quem ? ` por ${quem}` : ""}`,
     })
     lead.status = mudancas.status
   }

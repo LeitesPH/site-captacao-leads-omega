@@ -10,13 +10,15 @@ import path from "node:path"
 
 const pastaTemporaria = fs.mkdtempSync(path.join(os.tmpdir(), "leads-teste-"))
 process.env.PASTA_DADOS = pastaTemporaria
-process.env.SENHA_PAINEL = "senha-de-teste"
+process.env.USUARIO_INICIAL = "chefe"
+process.env.SENHA_INICIAL = "senha-de-teste"
 process.env.TOKEN_WEBHOOK = "token-de-teste"
 process.env.PORTA = "0"
 
 const { config } = await import("../src/config.js")
 const { tratarApi } = await import("../src/rotas.js")
 const { aguardarGravacoes } = await import("../src/db.js")
+const { garantirContaInicial, criarUsuario } = await import("../src/usuarios.js")
 const http = await import("node:http")
 
 let servidor
@@ -24,6 +26,9 @@ let base
 let cookie = ""
 
 before(async () => {
+  garantirContaInicial()
+  criarUsuario({ login: "vendedor1", senha: "senha-vendedor", papel: "vendedor" })
+
   servidor = http.createServer(async (req, res) => {
     const url = new URL(req.url, "http://localhost")
     if (await tratarApi(req, res, url)) return
@@ -176,18 +181,72 @@ test("webhook aceita token certo e traduz nomes de campo externos", async () => 
 })
 
 test("login com senha errada e recusado", async () => {
-  const { status } = await chamar("/api/login", { method: "POST", corpo: { senha: "errada" } })
+  const { status, dados } = await chamar("/api/login", {
+    method: "POST",
+    corpo: { usuario: "chefe", senha: "errada" },
+  })
   assert.equal(status, 401)
+  assert.equal(dados.erro, "Login ou senha incorretos")
 })
 
-test("login com a senha certa libera o painel", async () => {
-  const { status } = await chamar("/api/login", {
+test("login com usuario que nao existe da a mesma mensagem", async () => {
+  const { status, dados } = await chamar("/api/login", {
     method: "POST",
-    corpo: { senha: "senha-de-teste" },
+    corpo: { usuario: "ninguem", senha: "qualquer" },
+  })
+  assert.equal(status, 401)
+  // mensagem identica de proposito: nao entrega quais logins existem
+  assert.equal(dados.erro, "Login ou senha incorretos")
+})
+
+test("login certo libera o painel e diz quem entrou", async () => {
+  const { status, dados, resposta } = await chamar("/api/login", {
+    method: "POST",
+    corpo: { usuario: "chefe", senha: "senha-de-teste" },
   })
   assert.equal(status, 200)
+  assert.equal(dados.usuario.login, "chefe")
+  assert.equal(dados.usuario.papel, "admin")
+  assert.equal(dados.usuario.senha_hash, undefined)
+
+  const cookie = resposta.headers.get("set-cookie")
+  assert.match(cookie, /HttpOnly/)
+  assert.match(cookie, /SameSite=Lax/)
+
   const sessao = await chamar("/api/sessao")
   assert.equal(sessao.dados.logado, true)
+  assert.equal(sessao.dados.usuario.login, "chefe")
+})
+
+test("o login nao diferencia maiusculas de minusculas", async () => {
+  const { status } = await chamar("/api/login", {
+    method: "POST",
+    corpo: { usuario: "  CHEFE ", senha: "senha-de-teste" },
+  })
+  assert.equal(status, 200)
+})
+
+test("o cookie ganha a marca Secure quando o acesso vem por https", async () => {
+  const semHttps = await chamar("/api/login", {
+    method: "POST",
+    corpo: { usuario: "chefe", senha: "senha-de-teste" },
+  })
+  assert.ok(!/Secure/.test(semHttps.resposta.headers.get("set-cookie")))
+
+  const comHttps = await chamar("/api/login", {
+    method: "POST",
+    headers: { "x-forwarded-proto": "https" },
+    corpo: { usuario: "chefe", senha: "senha-de-teste" },
+  })
+  assert.match(comHttps.resposta.headers.get("set-cookie"), /Secure/)
+})
+
+test("cookie adulterado nao da acesso", async () => {
+  const bom = cookie
+  cookie = "sessao_painel=YWRtaW4.99999999999999.assinaturafalsa"
+  const { status } = await chamar("/api/leads")
+  assert.equal(status, 401)
+  cookie = bom
 })
 
 test("os leads aparecem separados em A e C", async () => {
@@ -260,6 +319,19 @@ test("a exportacao gera um CSV com cabecalho e uma linha por lead", async () => 
   assert.equal(linhas.length, 3)
   assert.match(linhas[0], /Classe/)
   assert.match(dados, /joao@exemplo\.com/)
+})
+
+test("vendedor nao pode excluir lead", async () => {
+  const guardado = cookie
+  cookie = ""
+  await chamar("/api/login", {
+    method: "POST",
+    corpo: { usuario: "vendedor1", senha: "senha-vendedor" },
+  })
+  const lista = await chamar("/api/leads")
+  const { status } = await chamar(`/api/leads/${lista.dados.leads[0].id}`, { method: "DELETE" })
+  assert.equal(status, 403)
+  cookie = guardado
 })
 
 test("excluir remove o lead da base", async () => {

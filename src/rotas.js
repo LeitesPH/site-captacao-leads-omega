@@ -39,7 +39,8 @@ import {
   responderJson,
   responderTexto,
 } from "./http.js"
-import { cookieDeLogin, cookieDeLogout, estaLogado, senhaCorreta } from "./sessao.js"
+import { cookieDeLogin, cookieDeLogout, usuarioLogado } from "./sessao.js"
+import { autenticar } from "./usuarios.js"
 
 const limitadorInscricao = criarLimitador({
   limite: config.limiteEnviosPorIp,
@@ -282,28 +283,39 @@ export async function tratarApi(req, res, url) {
     } catch {
       corpo = {}
     }
-    if (!senhaCorreta(corpo.senha)) {
-      responderJson(res, 401, { ok: false, erro: "Senha incorreta" })
+    const usuario = autenticar(corpo.usuario, corpo.senha)
+    if (!usuario) {
+      // Mensagem unica de proposito: dizer "esse login nao existe"
+      // entregaria quais logins sao validos para quem esta tentando adivinhar.
+      responderJson(res, 401, { ok: false, erro: "Login ou senha incorretos" })
       return true
     }
-    responderJson(res, 200, { ok: true }, { "Set-Cookie": cookieDeLogin() })
+    responderJson(
+      res,
+      200,
+      { ok: true, usuario },
+      { "Set-Cookie": cookieDeLogin(req, usuario.login) },
+    )
     return true
   }
 
   if (caminho === "/api/logout" && metodo === "POST") {
-    responderJson(res, 200, { ok: true }, { "Set-Cookie": cookieDeLogout() })
+    responderJson(res, 200, { ok: true }, { "Set-Cookie": cookieDeLogout(req) })
     return true
   }
 
   if (caminho === "/api/sessao" && metodo === "GET") {
-    responderJson(res, 200, { logado: estaLogado(req) })
+    const usuario = usuarioLogado(req)
+    responderJson(res, 200, { logado: Boolean(usuario), usuario })
     return true
   }
 
   // ---------- Daqui para baixo, so logado ----------
 
+  let euSou = null
   if (caminho.startsWith("/api/")) {
-    if (!estaLogado(req)) {
+    euSou = usuarioLogado(req)
+    if (!euSou) {
       responderJson(res, 401, { ok: false, erro: "Faça login para continuar" })
       return true
     }
@@ -315,7 +327,7 @@ export async function tratarApi(req, res, url) {
       faixas: FAIXAS,
       status: STATUS_LEAD,
       campos: CAMPOS.map(campoPublico),
-      avisoSenhaPadrao: config.senhaEhPadrao,
+      usuario: euSou,
     })
     return true
   }
@@ -378,7 +390,7 @@ export async function tratarApi(req, res, url) {
         return true
       }
 
-      const atualizado = atualizarLead(id, corpo)
+      const atualizado = atualizarLead(id, corpo, euSou)
       if (!atualizado) {
         responderJson(res, 404, { ok: false, erro: "Lead não encontrado" })
         return true
@@ -388,6 +400,13 @@ export async function tratarApi(req, res, url) {
     }
 
     if (metodo === "DELETE") {
+      if (euSou.papel !== "admin") {
+        responderJson(res, 403, {
+          ok: false,
+          erro: "Somente contas de administrador podem excluir leads",
+        })
+        return true
+      }
       const removido = removerLead(id)
       responderJson(res, removido ? 200 : 404, { ok: removido })
       return true

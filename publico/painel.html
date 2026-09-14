@@ -6,14 +6,18 @@
     <title>Painel de leads</title>
     <meta name="robots" content="noindex" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/fontes.css" />
     <link rel="stylesheet" href="/css/estilo.css" />
   </head>
   <body class="painel-corpo">
     <header class="topo-painel">
-      <div class="marca">
-        <span class="marca-icone">P</span>
-        <span id="nome-programa">Painel de leads</span>
-      </div>
+      <a class="logo-omega" href="/painel">
+        <img src="/logo-omega.svg" alt="Omega" width="46" height="41" />
+        <span class="logo-lockup-texto">
+          <span class="nome">omega</span>
+          <span class="assinatura">Diagnóstico Odontológico</span>
+        </span>
+      </a>
 
       <div class="abas" role="tablist">
         <button type="button" class="ativa" data-visao="quadro">Quadro A/B/C</button>
@@ -21,6 +25,8 @@
       </div>
 
       <span class="espacador"></span>
+
+      <span class="etiqueta etiqueta--neutra" id="quem-sou" title="Conta usada neste acesso"></span>
 
       <button class="botao botao--secundario botao--pequeno" id="botao-exportar" type="button">
         Exportar CSV
@@ -34,11 +40,6 @@
     </header>
 
     <main class="conteudo-painel">
-      <div class="aviso esconder" id="aviso-senha">
-        A senha do painel ainda é a padrão. Crie um arquivo <strong>.env</strong> com
-        <strong>SENHA_PAINEL=sua-senha</strong> antes de publicar o site.
-      </div>
-
       <section class="grade-indicadores" id="indicadores"></section>
 
       <div class="barra-ferramentas">

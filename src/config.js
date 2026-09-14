@@ -63,17 +63,20 @@ function obterSegredo() {
   return novo
 }
 
-const SENHA_PADRAO = "admin123"
-
 export const config = {
   porta: Number(process.env.PORTA || process.env.PORT || 3000),
-  senhaPainel: process.env.SENHA_PAINEL || SENHA_PADRAO,
-  senhaEhPadrao: !process.env.SENHA_PAINEL,
   tokenWebhook: process.env.TOKEN_WEBHOOK || "",
   segredo: obterSegredo(),
   nomePrograma: process.env.NOME_PROGRAMA || "Programa de Parceria",
   whatsappContato: (process.env.WHATSAPP_CONTATO || "").replace(/\D/g, ""),
   arquivoLeads: path.join(PASTA_DADOS, "leads.json"),
+  /**
+   * Marca o cookie de login como "Secure" (so trafega em https).
+   *   "auto"  - liga sozinho quando o pedido chegou por https (recomendado)
+   *   "sempre" - sempre ligado (use se o site so responde em https)
+   *   "nunca" - sempre desligado (so para depurar em http)
+   */
+  cookieSeguro: process.env.COOKIE_SEGURO || "auto",
   /** Duracao da sessao do painel, em horas */
   horasSessao: 12,
   /** Limite de inscricoes por IP em 10 minutos (anti-spam) */
@@ -82,11 +85,6 @@ export const config = {
 
 export function avisosDeConfiguracao() {
   const avisos = []
-  if (config.senhaEhPadrao) {
-    avisos.push(
-      `A senha do painel esta no valor padrao ("${SENHA_PADRAO}"). Crie um arquivo .env com SENHA_PAINEL=sua-senha antes de publicar o site.`,
-    )
-  }
   if (!config.tokenWebhook) {
     avisos.push(
       "TOKEN_WEBHOOK nao configurado: a rota /api/webhook/lead fica desligada ate voce definir um token no .env.",

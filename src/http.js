@@ -99,6 +99,20 @@ export function montarCookie(nome, valor, { maxAge, httpOnly = true, seguro = fa
   return partes.join("; ")
 }
 
+/**
+ * O pedido chegou por https?
+ * Atras de uma hospedagem (Render, Railway, nginx) a conexao ate o Node e
+ * http, e quem avisa que o visitante usou https e o cabecalho
+ * x-forwarded-proto.
+ */
+export function pedidoEhSeguro(req) {
+  const protocoloEncaminhado = req.headers["x-forwarded-proto"]
+  if (typeof protocoloEncaminhado === "string" && protocoloEncaminhado) {
+    return protocoloEncaminhado.split(",")[0].trim().toLowerCase() === "https"
+  }
+  return Boolean(req.socket?.encrypted)
+}
+
 export function ipDoPedido(req) {
   const encaminhado = req.headers["x-forwarded-for"]
   if (typeof encaminhado === "string" && encaminhado) return encaminhado.split(",")[0].trim()

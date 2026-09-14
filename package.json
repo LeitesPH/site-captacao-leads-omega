@@ -11,7 +11,8 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test testes/*.test.js",
-    "exemplo": "node ferramentas/dados-exemplo.js"
+    "exemplo": "node ferramentas/dados-exemplo.js",
+    "contas": "node ferramentas/contas.js"
   },
   "keywords": [
     "leads",

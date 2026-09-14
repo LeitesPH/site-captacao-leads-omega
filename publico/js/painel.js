@@ -49,9 +49,12 @@ async function iniciar() {
     return
   }
 
-  el("nome-programa").textContent = estado.configuracao.nomePrograma
   document.title = `Painel de leads · ${estado.configuracao.nomePrograma}`
-  if (estado.configuracao.avisoSenhaPadrao) el("aviso-senha").classList.remove("esconder")
+
+  const eu = estado.configuracao.usuario
+  if (eu) {
+    el("quem-sou").textContent = `${eu.nome || eu.login}${eu.papel === "admin" ? "" : " · vendedor"}`
+  }
 
   for (const campo of estado.configuracao.campos) {
     estado.camposPorId[campo.id] = campo
@@ -527,11 +530,13 @@ function desenharGaveta() {
           })
         : null,
       criar("span", { style: "flex:1" }),
-      criar("button", {
-        class: "botao botao--perigo botao--pequeno",
-        texto: "Excluir",
-        onclick: () => excluirLead(lead.id),
-      }),
+      estado.configuracao.usuario?.papel === "admin"
+        ? criar("button", {
+            class: "botao botao--perigo botao--pequeno",
+            texto: "Excluir",
+            onclick: () => excluirLead(lead.id),
+          })
+        : null,
     ]),
   )
 }
